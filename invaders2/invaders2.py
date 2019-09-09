@@ -17,8 +17,7 @@ def draw():  # Pygame Zero draw function
         screen.draw.text(player.name, center=(400, 500), owidth=0.5, ocolor=(
             255, 0, 0), color=(0, 64, 255), fontsize=60)
     if gameStatus == 1:  # playing the game
-        player.image = player.images[m
-        ath.floor(player.status/6)]
+        player.image = player.images[math.floor(player.status/6)]
         player.draw()
         if boss.active:
             boss.draw()

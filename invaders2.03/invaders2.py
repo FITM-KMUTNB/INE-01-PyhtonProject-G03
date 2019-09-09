@@ -5,13 +5,13 @@ import time
 from random import randint
 player = Actor("player", (400, 550))
 boss = Actor("boss")
-item = Actor('alien',(450,550))
-drop = False
+item = Actor('alien')
 gameStatus = 0
 highScore = []
 
 
 def draw():  # Pygame Zero draw function
+    global a
     screen.blit('background', (0, 0))
     if gameStatus == 0:  # display the title page
         drawCentreText(
@@ -22,14 +22,22 @@ def draw():  # Pygame Zero draw function
         player.image = player.images[math.floor(player.status/6)]
         player.draw()
         if boss.active:
-            boss.draw()
+           boss.draw()
+           item.draw()
+            #if (a%2)==0:
+                #time_drop()
+        #if itemdrop:
+            #item.draw()
+            #item.x = randint(40,760)
+            #item.y = 40
+        #item.draw()
+        #if itemdrop:
+        #item()
         drawLasers()
         drawAliens()
-        time()
+        #time()
         #item.draw()
         #drawBases()
-        if drop == True:
-            item.draw()
         screen.draw.text(str(score), topright=(780, 10), owidth=0.5, ocolor=(
             255, 255, 255), color=(0, 64, 255), fontsize=60)
         screen.draw.text("LEVEL " + str(level), midtop=(400, 10), owidth=0.5,
@@ -54,6 +62,7 @@ def drawCentreText(t):
 
 def update():  # Pygame Zero update function
     global moveCounter, player, gameStatus, lasers, level, boss
+
     if gameStatus == 0:
         if keyboard.RETURN and player.name != "":
             gameStatus = 1
@@ -160,7 +169,7 @@ def drawLasers():
 
 
 def checkKeys():
-    global player, score
+    global player, score, item
     if keyboard.left:
         if player.x > 40:
             player.x -= 5
@@ -173,6 +182,7 @@ def checkKeys():
     if keyboard.down:
         if player.y < 570:
             player.y += 5
+    
     if keyboard.space:
         if player.laserActive == 1:
             sounds.gun.play()
@@ -182,6 +192,12 @@ def checkKeys():
             lasers[len(lasers)-1].status = 0
             lasers[len(lasers)-1].type = 1
             score -= 100
+    
+    item.y += 2
+    item_collected = player.colliderect(item)
+    if item_collected:
+        place_item()
+        score += 100000
 
 
 def makeLaserActive():
@@ -222,8 +238,12 @@ def listCleanup(l):
 
 
 def checkLaserHit(l):
-    global player
+    global player,boss
     if player.collidepoint((lasers[l].x, lasers[l].y)):
+        sounds.explosion.play()
+        player.status = 1
+        lasers[l].status = 1
+    if player.colliderect(boss):
         sounds.explosion.play()
         player.status = 1
         lasers[l].status = 1
@@ -234,7 +254,7 @@ def checkLaserHit(l):
 
 
 def checkPlayerLaserHit(l):
-    global score, boss
+    global score, boss,aliens,player
     #for b in range(len(bases)):
         #if bases[b].collideLaser(lasers[l]):
             #lasers[l].status = 1
@@ -248,6 +268,7 @@ def checkPlayerLaserHit(l):
             lasers[l].status = 1
             boss.active = 0
             score += 5000
+
 
 
 def updateAliens():
@@ -282,7 +303,7 @@ def updateAliens():
 
 
 def updateBoss():
-    global boss, level, player, lasers
+    global boss, level, player, lasers ,item
     if boss.active:
         boss.y += (0.3*level)
         if boss.direction == 0:
@@ -304,9 +325,16 @@ def updateBoss():
     else:
         if randint(0, 800) == 0:
             boss.active = True
+            #item.draw()
+            #time_drop()
+            item.x = randint(40,760)
+            item.y = 40
             boss.x = 800
             boss.y = 100
             boss.direction = 0
+        
+            
+        
 
 
 def init():
@@ -360,8 +388,15 @@ def collideLaser(self, other):
             #bases[bc].height = 60
             #bc += 1
 #def item():
-def time():
-    drop = True
-clock.schedule(time, 10.0)
+#def item():
+    #item.draw()
+    #item.x = randint(40,760)
+    #item.y = 40
+    #item.y -= 3
+def place_item():
+    global item
+    item.x = randint(40,760)
+    item.y = -3000
+
 init()
 pgzrun.go()

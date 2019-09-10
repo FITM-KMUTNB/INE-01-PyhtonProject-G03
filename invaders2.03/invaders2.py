@@ -6,16 +6,18 @@ from random import randint
 player = Actor("player", (400, 550))
 boss = Actor("boss")
 item = Actor('alien')
+logo = Actor('logo',(400,100))
 gameStatus = 0
 highScore = []
-
+a = 0
 
 def draw():  # Pygame Zero draw function
     global a
     screen.blit('background', (0, 0))
     if gameStatus == 0:  # display the title page
+        logo.draw()
         drawCentreText(
-            "PYGAME ZERO INVADERS\n\n\nType your name then\npress Enter to start\n(arrow keys move, space to fire)")
+            "\n\n\nType your name then\npress Enter to start\n(arrow keys move, space to fire)")
         screen.draw.text(player.name, center=(400, 500), owidth=0.5, ocolor=(
             255, 0, 0), color=(0, 64, 255), fontsize=60)
     if gameStatus == 1:  # playing the game
@@ -169,7 +171,7 @@ def drawLasers():
 
 
 def checkKeys():
-    global player, score, item
+    global player, score, item ,a
     if keyboard.left:
         if player.x > 40:
             player.x -= 5
@@ -187,11 +189,17 @@ def checkKeys():
         if player.laserActive == 1:
             sounds.gun.play()
             player.laserActive = 0
-            clock.schedule(makeLaserActive, 1.0)
+            if a == 1:
+                clock.schedule(makeLaserActive, 0.25)
+            elif a >= 2:
+                clock.schedule(makeLaserActive, 0.0)
+            else:
+                clock.schedule(makeLaserActive, 1.0)
+                score -= 100
             lasers.append(Actor("laser2", (player.x, player.y-32)))
             lasers[len(lasers)-1].status = 0
             lasers[len(lasers)-1].type = 1
-            score -= 100
+            
     
     item.y += 2
     item_collected = player.colliderect(item)
@@ -221,7 +229,7 @@ def updateLasers():
             if lasers[l].y > 600:
                 lasers[l].status = 1
         if lasers[l].type == 1:
-            lasers[l].y -= 5
+            lasers[l].y -= 10
             checkPlayerLaserHit(l)
             if lasers[l].y < 10:
                 lasers[l].status = 1
@@ -394,7 +402,8 @@ def collideLaser(self, other):
     #item.y = 40
     #item.y -= 3
 def place_item():
-    global item
+    global item,a
+    a = a+1
     item.x = randint(40,760)
     item.y = -3000
 

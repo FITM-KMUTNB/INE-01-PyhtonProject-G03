@@ -10,7 +10,10 @@ logo = Actor('logo',(400,100))
 gameStatus = 0
 highScore = []
 a = 0
-
+R = False
+F = False
+Q = False
+timeup = False
 def draw():  # Pygame Zero draw function
     global a
     screen.blit('background', (0, 0))
@@ -171,7 +174,7 @@ def drawLasers():
 
 
 def checkKeys():
-    global player, score, item ,a
+    global player, score, item ,a,Q,R,F,timeup
     if keyboard.left:
         if player.x > 40:
             player.x -= 5
@@ -179,7 +182,7 @@ def checkKeys():
         if player.x < 760:
             player.x += 5
     if keyboard.up:
-        if player.y > 40:
+        if player.y > 350:
             player.y -= 5
     if keyboard.down:
         if player.y < 570:
@@ -190,12 +193,27 @@ def checkKeys():
             sounds.gun.play()
             player.laserActive = 0
             if a == 1:
-                clock.schedule(makeLaserActive, 0.25)
-            elif a >= 2:
-                clock.schedule(makeLaserActive, 0.0)
+                clock.schedule(timeupA,5.0)
+                R = True
+                F = False
+                if timeup == True:
+                    a = 0
+                    nomale()
+                else:
+                    itemA()
+                    timeup == False
+            elif a == 2:
+                R = False
+                F = True
+                clock.schedule(timeupA,5.0)
+                if timeup == True:
+                    nomale()
+                else:
+                    itemb()
+                    timeup == False
             else:
-                clock.schedule(makeLaserActive, 1.0)
-                score -= 100
+                nomale()
+                a = 0
             lasers.append(Actor("laser2", (player.x, player.y-32)))
             lasers[len(lasers)-1].status = 0
             lasers[len(lasers)-1].type = 1
@@ -211,6 +229,8 @@ def checkKeys():
 def makeLaserActive():
     global player
     player.laserActive = 1
+#def makerCooldown():
+
 
 
 #def checkBases():
@@ -403,9 +423,34 @@ def collideLaser(self, other):
     #item.y -= 3
 def place_item():
     global item,a
-    a = a+1
+    #a = randint(1,2)
+    a = a +1
     item.x = randint(40,760)
     item.y = -3000
 
+def itemA():
+    global Q,R,F
+    if R == True:
+        clock.schedule(makeLaserActive, 0.25)
+    else:
+        clock.schedule(makeLaserActive, 1.0)
+def nomale():
+    global Q,R,F
+    clock.schedule(makeLaserActive, 1)
+
+def itemb():
+    global score,Q,R,F
+    score += 10000
+    if F == True:
+        clock.schedule(makeLaserActive, 1)
+def timeupA():
+    global timeup
+    timeup = True
+#def timeupB():
+    #global a,timeup
+    #while timeup == False:
+        #if a == 1:
+            #clock.schedule(timeupA,5.0)
+            
 init()
 pgzrun.go()

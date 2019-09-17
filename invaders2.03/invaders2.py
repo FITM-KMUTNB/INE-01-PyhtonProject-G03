@@ -7,6 +7,8 @@ player = Actor("player", (400, 550))
 boss = Actor("boss")
 item = Actor('alien')
 logo = Actor('logo',(400,100))
+logo2 = Actor('logo2',(400,350))
+
 gameStatus = 0
 highScore = []
 a = 0
@@ -19,8 +21,9 @@ def draw():  # Pygame Zero draw function
     screen.blit('background', (0, 0))
     if gameStatus == 0:  # display the title page
         logo.draw()
-        drawCentreText(
-            "\n\n\nType your name then\npress Enter to start\n(arrow keys move, space to fire)")
+        logo2.draw()
+        #drawCentreText(
+            #"\n\n\nType your name then\npress Enter to start\n(arrow keys move, space to fire)")
         screen.draw.text(player.name, center=(400, 500), owidth=0.5, ocolor=(
             255, 0, 0), color=(0, 64, 255), fontsize=60)
     if gameStatus == 1:  # playing the game

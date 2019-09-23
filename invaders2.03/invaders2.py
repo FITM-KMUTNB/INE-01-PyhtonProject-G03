@@ -481,7 +481,7 @@ def nomale():
 def itemb():
     global score,Q,R,F
     if F == True:
-        clock.schedule(makeLaserActive, 0.50)
+        clock.schedule(makeLaserActive, 0.10)
 def timeupA():
     global timeup
     timeup = True

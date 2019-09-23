@@ -2,13 +2,17 @@ import pgzrun
 import math
 import re
 import time
+import random
 from random import randint
 player = Actor("player", (400, 550))
 boss = Actor("boss")
 item = Actor('alien')
 logo = Actor('logo',(400,100))
 logo2 = Actor('logo2',(400,350))
-
+power_up = 5000
+P = 0
+count = 0
+goitem = False
 gameStatus = 0
 highScore = []
 a = 0
@@ -17,7 +21,7 @@ F = False
 Q = False
 timeup = False
 def draw():  # Pygame Zero draw function
-    global a
+    global a,goitem
     screen.blit('background', (0, 0))
     if gameStatus == 0:  # display the title page
         logo.draw()
@@ -31,7 +35,8 @@ def draw():  # Pygame Zero draw function
         player.draw()
         if boss.active:
            boss.draw()
-           item.draw()
+        if goitem == True:
+            item.draw()
             #if (a%2)==0:
                 #time_drop()
         #if itemdrop:
@@ -79,6 +84,7 @@ def update():  # Pygame Zero update function
             checkKeys()
             updateLasers()
             updateBoss()
+            spawn()
             if moveCounter == 0:
                 updateAliens()
             moveCounter += 1
@@ -192,41 +198,41 @@ def checkKeys():
             player.y += 5
     
     if keyboard.space:
+        global power_up,P,count
         if player.laserActive == 1:
+            count +=1
             sounds.gun.play()
             player.laserActive = 0
             if a == 1:
-                clock.schedule(timeupA,5.0)
-                R = True
-                F = False
-                if timeup == True:
-                    a = 0
-                    nomale()
-                else:
+                power_up -= 200
+                if power_up > 0:
+                    R = True
                     itemA()
-                    timeup == False
-            elif a == 2:
-                R = False
-                F = True
-                clock.schedule(timeupA,5.0)
-                if timeup == True:
-                    nomale()
                 else:
+                    R = False
+                    nomale()
+            elif a == 2:
+                if count == 1:
+                    P = -9
+                elif count == 2:
+                    P = 0
+                elif count == 3:
+                    P = 9
+                    count = 0
+                power_up -= 200
+                if power_up > 0:
+                    F = True
                     itemb()
-                    timeup == False
+                else:
+                    F = False
+                    P = 0
+                    nomale()
             else:
                 nomale()
                 a = 0
             lasers.append(Actor("laser2", (player.x, player.y-32)))
             lasers[len(lasers)-1].status = 0
             lasers[len(lasers)-1].type = 1
-            
-    
-    item.y += 2
-    item_collected = player.colliderect(item)
-    if item_collected:
-        place_item()
-        score += 100000
 
 
 def makeLaserActive():
@@ -244,7 +250,7 @@ def makeLaserActive():
 
 
 def updateLasers():
-    global lasers, aliens
+    global lasers, aliens,a,P
     for l in range(len(lasers)):
         if lasers[l].type == 0:
             lasers[l].y += 2
@@ -253,6 +259,9 @@ def updateLasers():
                 lasers[l].status = 1
         if lasers[l].type == 1:
             lasers[l].y -= 10
+            if a == 2:
+                lasers[l].y -= 7
+                lasers[l].x += P
             checkPlayerLaserHit(l)
             if lasers[l].y < 10:
                 lasers[l].status = 1
@@ -319,7 +328,7 @@ def updateAliens():
             aliens[a].image = "alien1"
         else:
             aliens[a].image = "alien1b"
-            if randint(0, 5) == 0:
+            if randint(0, 50) == 0:
                 lasers.append(Actor("laser1", (aliens[a].x, aliens[a].y)))
                 lasers[len(lasers)-1].status = 0
                 lasers[len(lasers)-1].type = 0
@@ -349,20 +358,17 @@ def updateBoss():
             sounds.explosion.play()
             player.status = 1
             boss.active = False
-        if randint(0, 30) == 0:
+        if randint(0, 200) == 0:
             lasers.append(Actor("laser1", (boss.x, boss.y)))
             lasers[len(lasers)-1].status = 0
             lasers[len(lasers)-1].type = 0
     else:
         if randint(0, 800) == 0:
             boss.active = True
-            #item.draw()
-            #time_drop()
-            item.x = randint(40,760)
-            item.y = 40
             boss.x = 800
             boss.y = 100
             boss.direction = 0
+
         
             
         
@@ -424,12 +430,30 @@ def collideLaser(self, other):
     #item.x = randint(40,760)
     #item.y = 40
     #item.y -= 3
+def spawn():
+    global item,goitem,score
+    if goitem == True:
+        item.y += 2
+        item_collected = player.colliderect(item)
+        if item_collected:
+            place_item()
+            score += 5000
+            goitem = False
+        if item.y == 600:
+            goitem = False
+    else:
+        if randint(0,150)== 0:
+            goitem = True
+            item.x = randint(40,760)
+            item.y = 40
+
 def place_item():
-    global item,a
-    #a = randint(1,2)
-    a = a +1
+    global item,a,power_up,count
+    a = randint(1,2)
     item.x = randint(40,760)
-    item.y = -3000
+    item.y = -5000
+    count = 0
+    power_up = 5000
 
 def itemA():
     global Q,R,F
@@ -443,9 +467,8 @@ def nomale():
 
 def itemb():
     global score,Q,R,F
-    score += 10000
     if F == True:
-        clock.schedule(makeLaserActive, 1)
+        clock.schedule(makeLaserActive, 0.50)
 def timeupA():
     global timeup
     timeup = True

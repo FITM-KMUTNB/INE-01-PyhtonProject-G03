@@ -341,7 +341,7 @@ def updateAliens():
             aliens[a].image = "alien1"
         else:
             aliens[a].image = "alien1b"
-            if randint(0, 50) == 0:
+            if randint(0, 25) == 0:
                 lasers.append(Actor("laser1", (aliens[a].x, aliens[a].y)))
                 lasers[len(lasers)-1].status = 0
                 lasers[len(lasers)-1].type = 0

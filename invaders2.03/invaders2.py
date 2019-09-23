@@ -2,6 +2,7 @@ import pgzrun
 import math
 import re
 import time
+import pickle
 import random
 from random import randint
 player = Actor("player", (400, 550))
@@ -128,9 +129,15 @@ def readHighScore():
     global highScore, score, player
     highScore = []
     try:
-        hsFile = open("highscores.txt", "r")
-        for line in hsFile:
-            highScore.append(line.rstrip())
+        hsFile = open("highscores.dat", "rb")
+        end_of_file =False
+        while not end_of_file:
+            try:
+                word = pickle.load(hsFile)
+            
+                highScore.append(word.rstrip())
+            except EOFError:
+                end_of_file =True
     except:
         pass
     highScore.append(str(score) + " " + player.name)
@@ -143,19 +150,25 @@ def natural_key(string_):
 
 def writeHighScore():
     global highScore
-    hsFile = open("highscores.txt", "w")
+    hsFile = open("highscores.dat", "wb")
     for line in highScore:
-        hsFile.write(line + "\n")
+        pickle.dump(line,hsFile)
+    hsFile.close()
 
 
 def drawHighScore():
     global highScore
     y = 0
+    e = 0
     screen.draw.text("TOP SCORES", midtop=(400, 30), owidth=0.5, ocolor=(
         255, 255, 255), color=(0, 64, 255), fontsize=60)
     for line in highScore:
+        e = e+1
         if y < 400:
+            Q = str(e)
             screen.draw.text(line, midtop=(400, 100+y), owidth=0.5,
+                             ocolor=(0, 0, 255), color=(255, 255, 0), fontsize=50)
+            screen.draw.text(Q+" :",midtop=(100,100+y),owidth=0.5,
                              ocolor=(0, 0, 255), color=(255, 255, 0), fontsize=50)
             y += 50
     screen.draw.text("Press Escape to play again", center=(

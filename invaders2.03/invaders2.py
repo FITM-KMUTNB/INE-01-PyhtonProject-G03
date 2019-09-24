@@ -14,6 +14,7 @@ logo2 = Actor('logo2',(400,350))
 power_up = 5000
 P = 0
 count = 0
+count1 = 0
 goitem = False
 goitem2 = False
 gameStatus = 0
@@ -24,7 +25,7 @@ F = False
 Q = False
 timeup = False
 def draw():  # Pygame Zero draw function
-    global a,goitem,goitem2,item2
+    global a,goitem,goitem2,item2,count1
     screen.blit('background', (0, 0))
     if gameStatus == 0:  # display the title page
         logo.draw()
@@ -36,8 +37,20 @@ def draw():  # Pygame Zero draw function
     if gameStatus == 1:  # playing the games
         player.image = player.images[math.floor(player.status/6)]
         player.draw()
+        count1 = randint(0,3)
         if boss.active:
-           boss.draw()
+            if count1 == 1:
+                boss.image = 'boss'
+                boss.draw()
+            elif count1 == 2:
+                boss.image = 'boss1'
+                boss.draw()
+            elif count1 == 3:
+                boss.image ='boss2'
+                boss.draw()
+            else:
+                boss.image == 'boss3'
+                boss.draw()
         if goitem == True:
             item.draw()
         if goitem2 == True:
@@ -491,7 +504,7 @@ def spawn():
 def spawnitem2():
     global itemdbuff,goitem2,score
     if goitem2 == True:
-        itemdbuff.y += 2
+        itemdbuff.y += 6
         item_collected = player.colliderect(itemdbuff)
         if item_collected:
             place_item2()

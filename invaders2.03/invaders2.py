@@ -4,16 +4,18 @@ import re
 import time
 import pickle
 import random
-from random import randint
+from random import randint  
 player = Actor("player", (400, 550))
 boss = Actor("boss")
 item = Actor('alien')
+itemdbuff =Actor('alienpng')
 logo = Actor('logo',(400,100))
 logo2 = Actor('logo2',(400,350))
 power_up = 5000
 P = 0
 count = 0
 goitem = False
+goitem2 = False
 gameStatus = 0
 highScore = []
 a = 0
@@ -22,7 +24,7 @@ F = False
 Q = False
 timeup = False
 def draw():  # Pygame Zero draw function
-    global a,goitem
+    global a,goitem,goitem2,item2
     screen.blit('background', (0, 0))
     if gameStatus == 0:  # display the title page
         logo.draw()
@@ -31,13 +33,17 @@ def draw():  # Pygame Zero draw function
             #"\n\n\nType your name then\npress Enter to start\n(arrow keys move, space to fire)")
         screen.draw.text(player.name, center=(400, 500), owidth=0.5, ocolor=(
             255, 0, 0), color=(0, 64, 255), fontsize=60)
-    if gameStatus == 1:  # playing the game
+    if gameStatus == 1:  # playing the games
         player.image = player.images[math.floor(player.status/6)]
         player.draw()
         if boss.active:
            boss.draw()
         if goitem == True:
             item.draw()
+        if goitem2 == True:
+            itemdbuff.draw()
+        #if goitem2 == False:
+            
             #if (a%2)==0:
                 #time_drop()
         #if itemdrop:
@@ -86,6 +92,7 @@ def update():  # Pygame Zero update function
             updateLasers()
             updateBoss()
             spawn()
+            spawnitem2()
             if moveCounter == 0:
                 updateAliens()
             moveCounter += 1
@@ -198,17 +205,33 @@ def drawLasers():
 def checkKeys():
     global player, score, item ,a,Q,R,F,timeup
     if keyboard.left:
-        if player.x > 40:
-            player.x -= 5
+        if a == 30:
+            if player.x > 40:
+                player.x -= 2
+        else:
+            if player.x > 40:
+                player.x -= 5
     if keyboard.right:
-        if player.x < 760:
-            player.x += 5
+        if a == 30:
+            if player.x < 760:
+                player.x += 2
+        else:
+            if player.x < 760:
+                player.x += 5
     if keyboard.up:
-        if player.y > 350:
-            player.y -= 5
+        if a == 30:
+            if player.y > 350:
+                player.y -= 2 
+        else:
+            if player.y > 350:
+                player.y -= 5
     if keyboard.down:
-        if player.y < 570:
-            player.y += 5
+        if a == 30:
+            if player.y < 570:
+                player.y += 2
+        else:
+            if player.y < 570:
+                player.y += 5
     
     if keyboard.space:
         global power_up,P,count
@@ -239,6 +262,12 @@ def checkKeys():
                 else:
                     F = False
                     P = 0
+                    nomale()
+            elif a == 30:
+                power_up -= 200
+                if power_up > 0:
+                    item2()
+                else:
                     nomale()
             else:
                 nomale()
@@ -459,6 +488,22 @@ def spawn():
             goitem = True
             item.x = randint(40,760)
             item.y = 40
+def spawnitem2():
+    global itemdbuff,goitem2,score
+    if goitem2 == True:
+        itemdbuff.y += 2
+        item_collected = player.colliderect(itemdbuff)
+        if item_collected:
+            place_item2()
+            score -= 5000
+            goitem2 = False
+        if itemdbuff.y == 600:
+            goitem2 = False
+    else:
+        if randint(0,300)== 0:
+            goitem2 = True
+            itemdbuff.x = randint(40,760)
+            itemdbuff.y = 40
 
 def place_item():
     global item,a,power_up,count
@@ -467,7 +512,14 @@ def place_item():
     item.y = -5000
     count = 0
     power_up = 5000
-
+def place_item2():
+    global itemdbuff,a,power_up
+    itemdbuff.x = randint(40,760)
+    itemdbuff.y = -100000
+    a = 30
+    power_up = 2000
+def item2():
+    clock.schedule(makeLaserActive, 1.5)
 def itemA():
     global Q,R,F
     if R == True:

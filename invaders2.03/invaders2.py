@@ -37,19 +37,13 @@ def draw():  # Pygame Zero draw function
     if gameStatus == 1:  # playing the games
         player.image = player.images[math.floor(player.status/6)]
         player.draw()
-        count1 = randint(0,3)
+        count1 = randint(0,20)
         if boss.active:
             if count1 == 1:
                 boss.image = 'boss'
                 boss.draw()
             elif count1 == 2:
                 boss.image = 'boss1'
-                boss.draw()
-            elif count1 == 3:
-                boss.image ='boss2'
-                boss.draw()
-            else:
-                boss.image == 'boss3'
                 boss.draw()
         if goitem == True:
             item.draw()

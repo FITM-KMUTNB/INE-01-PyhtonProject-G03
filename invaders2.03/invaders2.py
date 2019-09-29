@@ -13,6 +13,7 @@ logo = Actor('logo',(400,100))
 logo2 = Actor('logo2',(400,350))
 power_up = 0
 power_up2 = 0
+num = 0
 P = 0
 count = 0
 count1 = 0
@@ -68,11 +69,12 @@ def draw():  # Pygame Zero draw function
     if gameStatus == 2:  # game over show the leaderboard
         drawHighScore()
 def playerchange():
-    global power_up,power_up2,player
+    global power_up,power_up2,player,num
     if power_up > 0:
-        player.image = 'player'
-    elif power_up2 > 0:
-        player.image = 'player1'
+        if num == 1:
+            player.image = 'player1'
+        else:
+            player.image = 'player'
     else:
         player.image = player.images[math.floor(player.status/6)]
 
@@ -236,14 +238,13 @@ def checkKeys():
                 player.y += 5
     
     if keyboard.space:
-        global power_up,P,count,power_up2
+        global power_up,P,count,power_up2,num
         if player.laserActive == 1:
             count +=1
             sounds.gun.play()
             player.laserActive = 0
             if a == 1:
                 power_up -= 200
-                power_up2 = 0
                 if power_up > 0:
                     R = True
                     itemA()
@@ -259,7 +260,6 @@ def checkKeys():
                     P = 9
                     count = 0
                 power_up -= 200
-                power_up2 = 0
                 if power_up > 0:
                     F = True
                     itemb()
@@ -268,7 +268,8 @@ def checkKeys():
                     P = 0
                     nomale()
             elif a == 30:
-                power_up2 = power_up-200
+                power_up -= 200
+                print(power_up)
                 if power_up > 0:
                     item2()
                 else:
@@ -495,7 +496,7 @@ def spawn():
             item.x = randint(40,760)
             item.y = 40
 def spawnitem2():
-    global itemdbuff,goitem2,score
+    global itemdbuff,goitem2,score,power_up2
     if goitem2 == True:
         itemdbuff.y += 6
         item_collected = player.colliderect(itemdbuff)
@@ -520,28 +521,29 @@ def place_item():
     power_up = 5000
 def place_item2():
     global itemdbuff,a,power_up
+    power_up = 2000
     itemdbuff.x = randint(40,760)
     itemdbuff.y = -100000
     a = 30
-    power_up = 2000
 def item2():
-    global power_up2,power_up
-    power_up = 0
-    power_up2 = 2000
+    global num
+    num = 1
     clock.schedule(makeLaserActive, 1.5)
 def itemA():
-    global Q,R,F
+    global Q,R,F,num
+    num = 0
     if R == True:
         clock.schedule(makeLaserActive, 0.25)
     else:
         clock.schedule(makeLaserActive, 1.0)
 def nomale():
-    global Q,R,F,power_up2
-    power_up2 = 0
+    global Q,R,F,num
+    num = 0
     clock.schedule(makeLaserActive, 1)
 
 def itemb():
-    global score,Q,R,F
+    global score,Q,R,F,num
+    num = 0
     if F == True:
         clock.schedule(makeLaserActive, 0.10)
 def timeupA():

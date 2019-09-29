@@ -241,7 +241,7 @@ def checkKeys():
         global power_up,P,count,power_up2,num
         if player.laserActive == 1:
             count +=1
-            sounds.gun.play()
+            sounds.pew.play()
             player.laserActive = 0
             if a == 1:
                 power_up -= 200
@@ -269,7 +269,6 @@ def checkKeys():
                     nomale()
             elif a == 30:
                 power_up -= 200
-                print(power_up)
                 if power_up > 0:
                     item2()
                 else:
@@ -349,11 +348,13 @@ def checkPlayerLaserHit(l):
             #lasers[l].status = 1
     for a in range(len(aliens)):
         if aliens[a].collidepoint((lasers[l].x, lasers[l].y)):
+            sounds.expl6.play()
             lasers[l].status = 1
             aliens[a].status = 1
             score += 1000
     if boss.active:
         if boss.collidepoint((lasers[l].x, lasers[l].y)):
+            sounds.expl3.play()
             lasers[l].status = 1
             boss.active = 0
             score += 5000
@@ -361,7 +362,7 @@ def checkPlayerLaserHit(l):
 
 
 def updateAliens():
-    global moveSequence, lasers, moveDelay
+    global moveSequence, lasers, moveDelay,level
     movex = movey = 0
     if moveSequence < 10 or moveSequence > 30:
         movex = -15
@@ -377,7 +378,7 @@ def updateAliens():
             aliens[a].image = "alien1"
         else:
             aliens[a].image = "alien1b"
-            if randint(0, 25) == 0:
+            if randint(0, 25-(3+level)) == 0:
                 lasers.append(Actor("laser1", (aliens[a].x, aliens[a].y)))
                 lasers[len(lasers)-1].status = 0
                 lasers[len(lasers)-1].type = 0
@@ -407,8 +408,9 @@ def updateBoss():
             sounds.explosion.play()
             player.status = 1
             boss.active = False
-        if randint(0, 200) == 0:
+        if randint(0, 200-(10*level)) == 0:
             lasers.append(Actor("laser1", (boss.x, boss.y)))
+            sounds.gun.play()
             lasers[len(lasers)-1].status = 0
             lasers[len(lasers)-1].type = 0
     else:

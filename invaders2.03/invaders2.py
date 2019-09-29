@@ -5,13 +5,14 @@ import time
 import pickle
 import random
 from random import randint  
-player = Actor("player", (400, 550))
+player = Actor("life", (400, 550))
 boss = Actor("boss")
 item = Actor('alien')
 itemdbuff =Actor('alienpng')
 logo = Actor('logo',(400,100))
 logo2 = Actor('logo2',(400,350))
-power_up = 5000
+power_up = 0
+power_up2 = 0
 P = 0
 count = 0
 count1 = 0
@@ -35,36 +36,22 @@ def draw():  # Pygame Zero draw function
         screen.draw.text(player.name, center=(400, 500), owidth=0.5, ocolor=(
             255, 0, 0), color=(0, 64, 255), fontsize=60)
     if gameStatus == 1:  # playing the games
-        player.image = player.images[math.floor(player.status/6)]
+        playerchange()
         player.draw()
-        count1 = randint(0,20)
+        count1 = randint(1,2)
         if boss.active:
             if count1 == 1:
-                boss.image = 'boss'
+                boss.image = 'boss2'
                 boss.draw()
             elif count1 == 2:
-                boss.image = 'boss1'
+                boss.image = 'boss3'
                 boss.draw()
         if goitem == True:
             item.draw()
         if goitem2 == True:
             itemdbuff.draw()
-        #if goitem2 == False:
-            
-            #if (a%2)==0:
-                #time_drop()
-        #if itemdrop:
-            #item.draw()
-            #item.x = randint(40,760)
-            #item.y = 40
-        #item.draw()
-        #if itemdrop:
-        #item()
         drawLasers()
         drawAliens()
-        #time()
-        #item.draw()
-        #drawBases()
         screen.draw.text(str(score), topright=(780, 10), owidth=0.5, ocolor=(
             255, 255, 255), color=(0, 64, 255), fontsize=60)
         screen.draw.text("LEVEL " + str(level), midtop=(400, 10), owidth=0.5,
@@ -80,7 +67,14 @@ def draw():  # Pygame Zero draw function
                 "LEVEL CLEARED!\nPress Enter to go to the next level")
     if gameStatus == 2:  # game over show the leaderboard
         drawHighScore()
-
+def playerchange():
+    global power_up,power_up2,player
+    if power_up > 0:
+        player.image = 'player'
+    elif power_up2 > 0:
+        player.image = 'player1'
+    else:
+        player.image = player.images[math.floor(player.status/6)]
 
 def drawCentreText(t):
     screen.draw.text(t, center=(400, 300), owidth=0.5, ocolor=(
@@ -100,6 +94,7 @@ def update():  # Pygame Zero update function
             updateBoss()
             spawn()
             spawnitem2()
+            #playerchange()
             if moveCounter == 0:
                 updateAliens()
             moveCounter += 1
@@ -241,13 +236,14 @@ def checkKeys():
                 player.y += 5
     
     if keyboard.space:
-        global power_up,P,count
+        global power_up,P,count,power_up2
         if player.laserActive == 1:
             count +=1
             sounds.gun.play()
             player.laserActive = 0
             if a == 1:
                 power_up -= 200
+                power_up2 = 0
                 if power_up > 0:
                     R = True
                     itemA()
@@ -263,6 +259,7 @@ def checkKeys():
                     P = 9
                     count = 0
                 power_up -= 200
+                power_up2 = 0
                 if power_up > 0:
                     F = True
                     itemb()
@@ -271,7 +268,7 @@ def checkKeys():
                     P = 0
                     nomale()
             elif a == 30:
-                power_up -= 200
+                power_up2 = power_up-200
                 if power_up > 0:
                     item2()
                 else:
@@ -327,8 +324,10 @@ def listCleanup(l):
 
 
 def checkLaserHit(l):
-    global player,boss
+    global player,boss,power_up,power_up2
     if player.collidepoint((lasers[l].x, lasers[l].y)):
+        power_up = 0
+        power_up2 = 0
         sounds.explosion.play()
         player.status = 1
         lasers[l].status = 1
@@ -431,7 +430,7 @@ def init():
     lasers = []
     moveDelay = 30
     boss.active = False
-    player.images = ["player", "explosion1", "explosion2",
+    player.images = ["life", "explosion1", "explosion2",
                      "explosion3", "explosion4", "explosion5"]
     player.laserActive = 1
     player.lives = 3
@@ -504,7 +503,7 @@ def spawnitem2():
             place_item2()
             score -= 5000
             goitem2 = False
-        if itemdbuff.y == 600:
+        if itemdbuff.y > 600:
             goitem2 = False
     else:
         if randint(0,300)== 0:
@@ -526,6 +525,9 @@ def place_item2():
     a = 30
     power_up = 2000
 def item2():
+    global power_up2,power_up
+    power_up = 0
+    power_up2 = 2000
     clock.schedule(makeLaserActive, 1.5)
 def itemA():
     global Q,R,F
@@ -534,7 +536,8 @@ def itemA():
     else:
         clock.schedule(makeLaserActive, 1.0)
 def nomale():
-    global Q,R,F
+    global Q,R,F,power_up2
+    power_up2 = 0
     clock.schedule(makeLaserActive, 1)
 
 def itemb():

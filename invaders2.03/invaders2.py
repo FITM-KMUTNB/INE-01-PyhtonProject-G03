@@ -6,13 +6,17 @@ import pickle
 import random
 from random import randint  
 player = Actor("life", (400, 550))
-boss = Actor("boss")
+boss = Actor("boss2")
 item = Actor('alien')
 itemdbuff =Actor('alienpng')
 logo = Actor('logo',(400,100))
 logo2 = Actor('logo2',(400,350))
 power_up = 0
 power_up2 = 0
+bigboss = Actor("boss")
+bigbossspawn = False
+bigbossgo = 0
+hpbigboss = 5000
 num = 0
 P = 0
 count = 0
@@ -27,7 +31,7 @@ F = False
 Q = False
 timeup = False
 def draw():  # Pygame Zero draw function
-    global a,goitem,goitem2,item2,count1
+    global a,goitem,goitem2,item2,count1,bigboss,bigbossspawn
     screen.blit('background', (0, 0))
     if gameStatus == 0:  # display the title page
         logo.draw()
@@ -47,6 +51,8 @@ def draw():  # Pygame Zero draw function
             elif count1 == 2:
                 boss.image = 'boss3'
                 boss.draw()
+        if bigbossspawn == True:
+            bigboss.draw()
         if goitem == True:
             item.draw()
         if goitem2 == True:
@@ -96,6 +102,7 @@ def update():  # Pygame Zero update function
             updateBoss()
             spawn()
             spawnitem2()
+            updatebigboss()
             #playerchange()
             if moveCounter == 0:
                 updateAliens()
@@ -342,7 +349,7 @@ def checkLaserHit(l):
 
 
 def checkPlayerLaserHit(l):
-    global score, boss,aliens,player
+    global score, boss,aliens,player,bigboss,bigbossspawn,hpbigboss
     #for b in range(len(bases)):
         #if bases[b].collideLaser(lasers[l]):
             #lasers[l].status = 1
@@ -358,6 +365,15 @@ def checkPlayerLaserHit(l):
             lasers[l].status = 1
             boss.active = 0
             score += 5000
+    if bigbossspawn == True:
+        if bigboss.collidepoint((lasers[l].x,lasers[l].y)):
+            hpbigboss -= 250
+            print(hpbigboss)
+            if hpbigboss > 0:
+                lasers[l].status = 1
+                sounds.explosion.play()
+            else:
+                bigbossspawn = False
 
 
 
@@ -419,11 +435,39 @@ def updateBoss():
             boss.x = 800
             boss.y = 100
             boss.direction = 0
-
-        
-            
-        
-
+def updatebigboss():
+    global bigbossspawn,level,player,lasers,item,bigboss,bigbossgo,hpbigboss
+    if bigbossspawn == True:
+        boss.y -= (0.2)
+        if bigbossgo == 0:
+            bigboss.x -= 1
+        else:
+            bigboss.x += 1
+        if level%5 != 0:
+            bigbossspawn = False
+        if bigboss.x < 100:
+            bigbossgo = 1
+        if bigboss.x > 700:
+            bigbossgo = 0
+        if bigboss.y > 500:
+            sounds.explosion.play()
+            player.status = 1
+            bigbossspawn = False
+        if randint(0, 100-(5*level)) == 0:
+            lasers.append(Actor("laser1", (bigboss.x, bigboss.y)))
+            sounds.gun.play()
+            lasers[len(lasers)-1].status = 0
+            lasers[len(lasers)-1].type = 0
+    else:
+        if (level % 5) == 0:
+            if (level % 5) == 0 and hpbigboss > 0:
+                bigbossspawn = True
+                bigboss.x = 800
+                bigboss.y = 100
+                bigbossgo = 0
+        else:
+            hpbigboss = 5000
+            bigbossspawn = False
 
 def init():
     global lasers, score, player, moveSequence, moveCounter, moveDelay, level, boss

@@ -103,7 +103,6 @@ def update():  # Pygame Zero update function
             spawn()
             spawnitem2()
             updatebigboss()
-            #playerchange()
             if moveCounter == 0:
                 updateAliens()
             moveCounter += 1
@@ -113,6 +112,10 @@ def update():  # Pygame Zero update function
                 player.status += 1
                 if player.status == 30:
                     player.lives -= 1
+            if level > 10:
+                readHighScore()
+                gameStatus = 2
+                writeHighScore()
         else:
             if keyboard.RETURN:
                 if player.lives > 0:
@@ -122,7 +125,6 @@ def update():  # Pygame Zero update function
                         level += 1
                         boss.active = False
                         initAliens()
-                        #initBases()
                 else:
                     readHighScore()
                     gameStatus = 2
@@ -203,9 +205,6 @@ def drawAliens():
         aliens[a].draw()
 
 
-#def drawBases():
-    #for b in range(len(bases)):
-        #bases[b].drawClipped()
 
 
 def drawLasers():
@@ -291,15 +290,6 @@ def checkKeys():
 def makeLaserActive():
     global player
     player.laserActive = 1
-#def makerCooldown():
-
-
-
-#def checkBases():
-    #for b in range(len(bases)):
-        #if l < len(bases):
-            #if bases[b].height < 5:
-               # del bases[b]
 
 
 def updateLasers():
@@ -342,17 +332,10 @@ def checkLaserHit(l):
         sounds.explosion.play()
         player.status = 1
         lasers[l].status = 1
-    #for b in range(len(bases)):
-        #if bases[b].collideLaser(lasers[l]):
-            #bases[b].height -= 10
-            #lasers[l].status = 1
 
 
 def checkPlayerLaserHit(l):
     global score, boss,aliens,player,bigboss,bigbossspawn,hpbigboss
-    #for b in range(len(bases)):
-        #if bases[b].collideLaser(lasers[l]):
-            #lasers[l].status = 1
     for a in range(len(aliens)):
         if aliens[a].collidepoint((lasers[l].x, lasers[l].y)):
             sounds.expl6.play()
@@ -368,11 +351,11 @@ def checkPlayerLaserHit(l):
     if bigbossspawn == True:
         if bigboss.collidepoint((lasers[l].x,lasers[l].y)):
             hpbigboss -= 250
-            print(hpbigboss)
             if hpbigboss > 0:
                 lasers[l].status = 1
                 sounds.explosion.play()
             else:
+                score += 10000
                 bigbossspawn = False
 
 
@@ -472,7 +455,6 @@ def updatebigboss():
 def init():
     global lasers, score, player, moveSequence, moveCounter, moveDelay, level, boss
     initAliens()
-    #initBases()
     moveCounter = moveSequence = player.status = score = player.laserCountdown = 0
     lasers = []
     moveDelay = 30
@@ -494,11 +476,6 @@ def initAliens():
         aliens[a].status = 0
 
 
-#def drawClipped(self):
-    #screen.surface.blit(self._surf, (self.x-32, self.y -
-                                     #self.height+30), (0, 0, 64, self.height))
-
-
 def collideLaser(self, other):
     return (
         self.x-20 < other.x+5 and
@@ -507,24 +484,6 @@ def collideLaser(self, other):
         self.y-self.height+30 + self.height > other.y
     )
 
-
-#def initBases():
-    #global bases
-    #bases = []
-    #bc = 0
-    #for b in range(3):
-        #for p in range(3):
-            #bases.append(Actor("base1", midbottom=(150+(b*200)+(p*40), 520)))
-            #bases[bc].drawClipped = drawClipped.__get__(bases[bc])
-            #bases[bc].collideLaser = collideLaser.__get__(bases[bc])
-            #bases[bc].height = 60
-            #bc += 1
-#def item():
-#def item():
-    #item.draw()
-    #item.x = randint(40,760)
-    #item.y = 40
-    #item.y -= 3
 def spawn():
     global item,goitem,score
     if goitem == True:
@@ -595,11 +554,6 @@ def itemb():
 def timeupA():
     global timeup
     timeup = True
-#def timeupB():
-    #global a,timeup
-    #while timeup == False:
-        #if a == 1:
-            #clock.schedule(timeupA,5.0)
             
 init()
 pgzrun.go()

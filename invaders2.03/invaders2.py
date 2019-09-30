@@ -14,7 +14,7 @@ logo2 = Actor('logo2',(400,350))
 power_up = 0
 power_up2 = 0
 bigboss = Actor("boss")
-bigbossspawn = False
+bigbossspawn = False #ตัวแปลต่างที่เอาไว้ใช้ในฟั่งชั่น
 bigbossgo = 0
 hpbigboss = 5000
 num = 0
@@ -36,8 +36,6 @@ def draw():  # Pygame Zero draw function
     if gameStatus == 0:  # display the title page
         logo.draw()
         logo2.draw()
-        #drawCentreText(
-            #"\n\n\nType your name then\npress Enter to start\n(arrow keys move, space to fire)")
         screen.draw.text(player.name, center=(400, 500), owidth=0.5, ocolor=(
             255, 0, 0), color=(0, 64, 255), fontsize=60)
     if gameStatus == 1:  # playing the games
@@ -74,7 +72,7 @@ def draw():  # Pygame Zero draw function
                 "LEVEL CLEARED!\nPress Enter to go to the next level")
     if gameStatus == 2:  # game over show the leaderboard
         drawHighScore()
-def playerchange():
+def playerchange():#การเปลี่ยนรูปเมื่อเก็บitem
     global power_up,power_up2,player,num
     if power_up > 0:
         if num == 1:
@@ -84,7 +82,7 @@ def playerchange():
     else:
         player.image = player.images[math.floor(player.status/6)]
 
-def drawCentreText(t):
+def drawCentreText(t):#กำหนดขาดหรือสีของตัวหนังสือ
     screen.draw.text(t, center=(400, 300), owidth=0.5, ocolor=(
         255, 255, 255), color=(255, 64, 0), fontsize=60)
 
@@ -135,7 +133,7 @@ def update():  # Pygame Zero update function
             gameStatus = 0
 
 
-def on_key_down(key):
+def on_key_down(key):#เช็กเมื่อกดเริ่มเกมหรือกดเริ่มเกมใหม่หลังการเกมover
     global player
     if gameStatus == 0 and key.name != "RETURN":
         if len(key.name) == 1:
@@ -145,7 +143,7 @@ def on_key_down(key):
                 player.name = player.name[:-1]
 
 
-def readHighScore():
+def readHighScore():#เอาคะแนนออกจากไฟล์
     global highScore, score, player
     highScore = []
     try:
@@ -164,11 +162,11 @@ def readHighScore():
     highScore.sort(key=natural_key, reverse=True)
 
 
-def natural_key(string_):
+def natural_key(string_):#กรอกชื่อตอนเริ่มเกม
     return [int(s) if s.isdigit() else s for s in re.split(r'(\d+)', string_)]
 
 
-def writeHighScore():
+def writeHighScore():#เขียนคะแนนลงไฟล์
     global highScore
     hsFile = open("highscores.dat", "wb")
     for line in highScore:
@@ -176,7 +174,7 @@ def writeHighScore():
     hsFile.close()
 
 
-def drawHighScore():
+def drawHighScore():#วาดคะแนนplayerที่ทำได้
     global highScore
     y = 0
     e = 0
@@ -195,24 +193,24 @@ def drawHighScore():
         400, 550), owidth=0.5, ocolor=(255, 255, 255), color=(255, 64, 0), fontsize=60)
 
 
-def drawLives():
+def drawLives():#วาดชีวิตplayer
     for l in range(player.lives):
         screen.blit("life", (10+(l*32), 10))
 
 
-def drawAliens():
+def drawAliens():#วาดAliens
     for a in range(len(aliens)):
         aliens[a].draw()
 
 
 
 
-def drawLasers():
+def drawLasers():#วาดlasers
     for l in range(len(lasers)):
         lasers[l].draw()
 
 
-def checkKeys():
+def checkKeys():#ฟั่งชั่นที่เซ็กการเคลื่อนที่ของplayerและอื่นๆ
     global player, score, item ,a,Q,R,F,timeup
     if keyboard.left:
         if a == 30:
@@ -287,12 +285,12 @@ def checkKeys():
             lasers[len(lasers)-1].type = 1
 
 
-def makeLaserActive():
+def makeLaserActive():#เซ็กplayerกดยิงlaser
     global player
     player.laserActive = 1
 
 
-def updateLasers():
+def updateLasers():#การเคลื่อนที่ของlaser
     global lasers, aliens,a,P
     for l in range(len(lasers)):
         if lasers[l].type == 0:
@@ -312,7 +310,7 @@ def updateLasers():
     aliens = listCleanup(aliens)
 
 
-def listCleanup(l):
+def listCleanup(l):#ฟั่งชั่นที่เอาไว้ลบสิ่งที่ระเบิดหรือหายไปแล้ว
     newList = []
     for i in range(len(l)):
         if l[i].status == 0:
@@ -320,7 +318,7 @@ def listCleanup(l):
     return newList
 
 
-def checkLaserHit(l):
+def checkLaserHit(l):#ฟั่งชั่นเอาไว้เซ็คเมื่อPlayerโดนยิง
     global player,boss,power_up,power_up2
     if player.collidepoint((lasers[l].x, lasers[l].y)):
         power_up = 0
@@ -334,7 +332,7 @@ def checkLaserHit(l):
         lasers[l].status = 1
 
 
-def checkPlayerLaserHit(l):
+def checkPlayerLaserHit(l):#การที่เอาไว้เซ็คPlayerยิงlaserโดนAliens
     global score, boss,aliens,player,bigboss,bigbossspawn,hpbigboss
     for a in range(len(aliens)):
         if aliens[a].collidepoint((lasers[l].x, lasers[l].y)):
@@ -360,7 +358,7 @@ def checkPlayerLaserHit(l):
 
 
 
-def updateAliens():
+def updateAliens():#การกำหนดการเคลื่อนที่ของAliensเเละการยิง
     global moveSequence, lasers, moveDelay,level
     movex = movey = 0
     if moveSequence < 10 or moveSequence > 30:
@@ -391,7 +389,7 @@ def updateAliens():
         moveSequence = 0
 
 
-def updateBoss():
+def updateBoss():#การกำหนดการเกิดของมินิบอส
     global boss, level, player, lasers ,item
     if boss.active:
         boss.y += (0.3*level)
@@ -418,7 +416,7 @@ def updateBoss():
             boss.x = 800
             boss.y = 100
             boss.direction = 0
-def updatebigboss():
+def updatebigboss():#การกำหนดการเกิดของบอสใหญ่
     global bigbossspawn,level,player,lasers,item,bigboss,bigbossgo,hpbigboss
     if bigbossspawn == True:
         boss.y -= (0.2)
@@ -426,7 +424,7 @@ def updatebigboss():
             bigboss.x -= 1
         else:
             bigboss.x += 1
-        if level%5 != 0:
+        if (level%5) != 0:
             bigbossspawn = False
         if bigboss.x < 100:
             bigbossgo = 1
@@ -452,7 +450,7 @@ def updatebigboss():
             hpbigboss = 5000
             bigbossspawn = False
 
-def init():
+def init():#เป็นที่รวมของฟั่งชั่นต่างๆ
     global lasers, score, player, moveSequence, moveCounter, moveDelay, level, boss
     initAliens()
     moveCounter = moveSequence = player.status = score = player.laserCountdown = 0
@@ -467,7 +465,7 @@ def init():
     level = 1
 
 
-def initAliens():
+def initAliens():#กำหนดการเกิดของaliens
     global aliens, moveCounter, moveSequence
     aliens = []
     moveCounter = moveSequence = 0
@@ -476,7 +474,7 @@ def initAliens():
         aliens[a].status = 0
 
 
-def collideLaser(self, other):
+def collideLaser(self, other):#ฟั่งชั้นที่เมื่ออะไรก็ตามโดนlasers
     return (
         self.x-20 < other.x+5 and
         self.y-self.height+30 < other.y and
@@ -484,7 +482,7 @@ def collideLaser(self, other):
         self.y-self.height+30 + self.height > other.y
     )
 
-def spawn():
+def spawn():#กำหนดการเกิดของไอเทมสีฟ้า
     global item,goitem,score
     if goitem == True:
         item.y += 2
@@ -500,7 +498,7 @@ def spawn():
             goitem = True
             item.x = randint(40,760)
             item.y = 40
-def spawnitem2():
+def spawnitem2():#กำหนดการเกิดของไอเทมสีแดง
     global itemdbuff,goitem2,score,power_up2
     if goitem2 == True:
         itemdbuff.y += 6
@@ -517,43 +515,40 @@ def spawnitem2():
             itemdbuff.x = randint(40,760)
             itemdbuff.y = 40
 
-def place_item():
+def place_item():#กำหนดการรีเกิดของไอเทมสีฟ้า
     global item,a,power_up,count
     a = randint(1,2)
     item.x = randint(40,760)
     item.y = -5000
     count = 0
     power_up = 5000
-def place_item2():
+def place_item2():#กำหนดการรีเกิดของไอเทมสีแดง
     global itemdbuff,a,power_up
     power_up = 2000
     itemdbuff.x = randint(40,760)
     itemdbuff.y = -100000
     a = 30
-def item2():
+def item2():#เมื่อถูกใช่งานจะทำให้เกิดสถานะผิดปกติกับตัวยาน
     global num
     num = 1
     clock.schedule(makeLaserActive, 1.5)
-def itemA():
+def itemA():#เมื่อถูกเรียกใช้จะทำให้เกิดการยิงไวขั้น
     global Q,R,F,num
     num = 0
     if R == True:
         clock.schedule(makeLaserActive, 0.25)
     else:
         clock.schedule(makeLaserActive, 1.0)
-def nomale():
+def nomale():#การยิงกระสุนแบบปกติ
     global Q,R,F,num
     num = 0
     clock.schedule(makeLaserActive, 1)
 
-def itemb():
+def itemb():#เมื่อถูกเรียกใช้จะทำให้เกิดการยิงแบบที่2
     global score,Q,R,F,num
     num = 0
     if F == True:
         clock.schedule(makeLaserActive, 0.10)
-def timeupA():
-    global timeup
-    timeup = True
             
 init()
 pgzrun.go()
